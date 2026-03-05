@@ -1,0 +1,123 @@
+{
+  "name": "diffus",
+  "displayName": "Diffus",
+  "description": "Inline diff review for AI code changes",
+  "version": "0.1.0",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "diffus.startTracking",
+        "title": "Diffus: Start Tracking Changes",
+        "icon": "$(play)"
+      },
+      {
+        "command": "diffus.stopTracking",
+        "title": "Diffus: Stop Tracking Changes",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "diffus.toggleTracking",
+        "title": "Diffus: Toggle Tracking"
+      },
+      {
+        "command": "diffus.nextFile",
+        "title": "Diffus: Next Changed File",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "diffus.prevFile",
+        "title": "Diffus: Previous Changed File",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "diffus.clearState",
+        "title": "Diffus: Clear All State"
+      },
+      {
+        "command": "diffus.acceptHunk",
+        "title": "Diffus: Accept Hunk"
+      },
+      {
+        "command": "diffus.rejectHunk",
+        "title": "Diffus: Reject Hunk"
+      },
+      {
+        "command": "diffus.acceptAllFile",
+        "title": "Diffus: Accept All Changes in File",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "diffus.rejectAllFile",
+        "title": "Diffus: Reject All Changes in File",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "diffus.showDiff",
+        "title": "Diffus: Show Diff",
+        "icon": "$(diff)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "diffus.prevFile",
+          "when": "diffus.multipleFilesChanged",
+          "group": "navigation@1"
+        },
+        {
+          "command": "diffus.nextFile",
+          "when": "diffus.multipleFilesChanged",
+          "group": "navigation@2"
+        },
+        {
+          "command": "diffus.acceptAllFile",
+          "when": "diffus.fileHasChanges",
+          "group": "navigation@3"
+        },
+        {
+          "command": "diffus.rejectAllFile",
+          "when": "diffus.fileHasChanges",
+          "group": "navigation@4"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "diffus.nextFile",
+        "key": "alt+]"
+      },
+      {
+        "command": "diffus.prevFile",
+        "key": "alt+["
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "npx @vscode/vsce package"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.2.0",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "diff": "^5.2.0",
+    "ignore": "^7.0.5"
+  }
+}
