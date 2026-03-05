@@ -1,13 +1,13 @@
-import * as vscode from "vscode";
-import { TrackingSession } from "./types";
-import { Ignore } from "ignore";
+import * as vscode from 'vscode';
+import { TrackingSession } from './types';
+import { Ignore } from 'ignore';
 import {
   isBinaryFile,
   shouldIgnorePath,
   isFileTooLarge,
   loadGitignoreFilter,
   isGitignored,
-} from "./fileUtils";
+} from './fileUtils';
 
 let sessionCounter = 0;
 
@@ -32,8 +32,8 @@ export class SnapshotManager {
       gitignoreFilters.set(folder.uri.fsPath, gitignore);
 
       const files = await vscode.workspace.findFiles(
-        new vscode.RelativePattern(folder, "**/*"),
-        "**/node_modules/**",
+        new vscode.RelativePattern(folder, '**/*'),
+        '**/node_modules/**',
       );
 
       for (const fileUri of files) {
@@ -51,7 +51,7 @@ export class SnapshotManager {
             continue;
           }
           const content = await vscode.workspace.fs.readFile(fileUri);
-          snapshots.set(filePath, Buffer.from(content).toString("utf-8"));
+          snapshots.set(filePath, Buffer.from(content).toString('utf-8'));
         } catch {
           // File may have been deleted between listing and reading
         }
@@ -69,7 +69,7 @@ export class SnapshotManager {
 
   /** Returns snapshot content. Undefined means file didn't exist at snapshot time. */
   getSnapshotOrEmpty(sessionId: string, filePath: string): string {
-    return this.getSnapshot(sessionId, filePath) ?? "";
+    return this.getSnapshot(sessionId, filePath) ?? '';
   }
 
   updateSnapshot(sessionId: string, filePath: string, content: string): void {
@@ -96,9 +96,7 @@ export class SnapshotManager {
     return Array.from(this.sessions.keys());
   }
 
-  getSessionData(
-    sessionId: string,
-  ): { id: string; snapshots: Map<string, string> } | undefined {
+  getSessionData(sessionId: string): { id: string; snapshots: Map<string, string> } | undefined {
     const session = this.sessions.get(sessionId);
     if (!session) {
       return undefined;

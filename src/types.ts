@@ -1,7 +1,7 @@
 export enum TrackingState {
-  Idle = "idle",
-  Tracking = "tracking",
-  StoppedWithPending = "stoppedWithPending",
+  Idle = 'idle',
+  Tracking = 'tracking',
+  StoppedWithPending = 'stoppedWithPending',
 }
 
 export interface DiffHunk {

@@ -29,17 +29,11 @@ export class StorageManager {
     if (!folders || folders.length === 0) {
       return 'no-workspace';
     }
-    return crypto.createHash('sha256')
-      .update(folders[0].uri.fsPath)
-      .digest('hex')
-      .substring(0, 16);
+    return crypto.createHash('sha256').update(folders[0].uri.fsPath).digest('hex').substring(0, 16);
   }
 
   private hashFilePath(filePath: string): string {
-    return crypto.createHash('sha256')
-      .update(filePath)
-      .digest('hex')
-      .substring(0, 32);
+    return crypto.createHash('sha256').update(filePath).digest('hex').substring(0, 32);
   }
 
   saveSessionSync(
@@ -54,11 +48,7 @@ export class StorageManager {
       for (const [filePath, content] of snapshots) {
         const hash = this.hashFilePath(filePath);
         files[filePath] = hash;
-        fs.writeFileSync(
-          path.join(this.snapshotsDir, `${hash}.snap`),
-          content,
-          'utf-8',
-        );
+        fs.writeFileSync(path.join(this.snapshotsDir, `${hash}.snap`), content, 'utf-8');
       }
 
       const state: PersistedState = {

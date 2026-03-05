@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
-import { DiffHunk } from "./types";
-import { DeletionMarker } from "./decorationManager";
+import * as vscode from 'vscode';
+import { DiffHunk } from './types';
+import { DeletionMarker } from './decorationManager';
 
 export interface DecorationRanges {
   addedRanges: vscode.Range[];
@@ -16,9 +16,7 @@ export function computeDecorationRanges(hunks: DiffHunk[]): DecorationRanges {
     if (hunk.newLines.length > 0) {
       for (let i = 0; i < hunk.newLines.length; i++) {
         const line0 = hunk.newStart - 1 + i;
-        addedRanges.push(
-          new vscode.Range(line0, 0, line0, Number.MAX_SAFE_INTEGER),
-        );
+        addedRanges.push(new vscode.Range(line0, 0, line0, Number.MAX_SAFE_INTEGER));
       }
     }
 
@@ -27,11 +25,9 @@ export function computeDecorationRanges(hunks: DiffHunk[]): DecorationRanges {
       // or at the insertion point for pure deletions
       const markerLine = Math.max(0, hunk.newStart - 1);
       const MAX_INLINE_LEN = 120;
-      const joined = hunk.oldLines.map((l) => l.trimEnd()).join(" | ");
+      const joined = hunk.oldLines.map((l) => l.trimEnd()).join(' | ');
       const content =
-        joined.length > MAX_INLINE_LEN
-          ? joined.slice(0, MAX_INLINE_LEN) + "…"
-          : joined;
+        joined.length > MAX_INLINE_LEN ? joined.slice(0, MAX_INLINE_LEN) + '…' : joined;
       deletionMarkers.push({
         line: markerLine,
         count: hunk.oldLines.length,

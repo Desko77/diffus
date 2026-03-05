@@ -7,21 +7,13 @@ export function computeHunks(
   oldContent: string,
   newContent: string,
   sessionId: string,
-  filePath: string
+  filePath: string,
 ): DiffHunk[] {
   if (oldContent === newContent) {
     return [];
   }
 
-  const patch = structuredPatch(
-    filePath,
-    filePath,
-    oldContent,
-    newContent,
-    '',
-    '',
-    { context: 0 }
-  );
+  const patch = structuredPatch(filePath, filePath, oldContent, newContent, '', '', { context: 0 });
 
   const hunks: DiffHunk[] = [];
 

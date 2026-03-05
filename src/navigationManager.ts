@@ -8,7 +8,9 @@ export class NavigationManager {
 
   async nextFile(): Promise<void> {
     const files = this.hunkManager.getChangedFiles();
-    if (files.length === 0) {return;}
+    if (files.length === 0) {
+      return;
+    }
 
     this.currentIndex = (this.currentIndex + 1) % files.length;
     await this.openFile(files[this.currentIndex]);
@@ -16,7 +18,9 @@ export class NavigationManager {
 
   async prevFile(): Promise<void> {
     const files = this.hunkManager.getChangedFiles();
-    if (files.length === 0) {return;}
+    if (files.length === 0) {
+      return;
+    }
 
     this.currentIndex = (this.currentIndex - 1 + files.length) % files.length;
     await this.openFile(files[this.currentIndex]);
@@ -33,7 +37,9 @@ export class NavigationManager {
 
   getCounterText(): string {
     const files = this.hunkManager.getChangedFiles();
-    if (files.length === 0) {return '';}
+    if (files.length === 0) {
+      return '';
+    }
 
     // Adjust index if it's out of bounds
     if (this.currentIndex >= files.length) {
@@ -45,7 +51,9 @@ export class NavigationManager {
 
   /** Reset index when current file matches a changed file */
   syncToActiveEditor(editor: vscode.TextEditor | undefined): void {
-    if (!editor) {return;}
+    if (!editor) {
+      return;
+    }
     const files = this.hunkManager.getChangedFiles();
     const idx = files.indexOf(editor.document.uri.fsPath);
     if (idx >= 0) {

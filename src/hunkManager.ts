@@ -1,16 +1,12 @@
-import * as vscode from "vscode";
-import { DiffHunk, FileChangeState } from "./types";
+import * as vscode from 'vscode';
+import { DiffHunk, FileChangeState } from './types';
 
 export class HunkManager {
   private fileStates: Map<string, FileChangeState[]> = new Map();
   private _onDidChange = new vscode.EventEmitter<string>();
   readonly onDidChange = this._onDidChange.event;
 
-  setHunksForFile(
-    filePath: string,
-    sessionId: string,
-    hunks: DiffHunk[],
-  ): void {
+  setHunksForFile(filePath: string, sessionId: string, hunks: DiffHunk[]): void {
     if (hunks.length === 0) {
       // Remove this session's entry for the file
       const states = this.fileStates.get(filePath);
@@ -46,9 +42,7 @@ export class HunkManager {
     return allHunks.sort((a, b) => a.newStart - b.newStart);
   }
 
-  getHunkById(
-    hunkId: string,
-  ): { hunk: DiffHunk; filePath: string } | undefined {
+  getHunkById(hunkId: string): { hunk: DiffHunk; filePath: string } | undefined {
     for (const [filePath, states] of this.fileStates) {
       for (const state of states) {
         const hunk = state.hunks.find((h) => h.id === hunkId);

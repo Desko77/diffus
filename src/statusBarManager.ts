@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import { TrackingState } from "./types";
+import * as vscode from 'vscode';
+import { TrackingState } from './types';
 
 export class StatusBarManager {
   private statusBarItem: vscode.StatusBarItem;
@@ -8,49 +8,49 @@ export class StatusBarManager {
 
   constructor() {
     this.statusBarItem = vscode.window.createStatusBarItem(
-      "diffus.tracking",
+      'diffus.tracking',
       vscode.StatusBarAlignment.Left,
       -100,
     );
-    this.statusBarItem.name = "Diffus Tracking";
-    this.statusBarItem.command = "diffus.toggleTracking";
-    this.statusBarItem.text = "$(play) Start Tracking";
-    this.statusBarItem.tooltip = "Diffus: Start tracking file changes";
+    this.statusBarItem.name = 'Diffus Tracking';
+    this.statusBarItem.command = 'diffus.toggleTracking';
+    this.statusBarItem.text = '$(play) Start Tracking';
+    this.statusBarItem.tooltip = 'Diffus: Start tracking file changes';
     this.statusBarItem.show();
 
     this.fileCounterItem = vscode.window.createStatusBarItem(
-      "diffus.fileCounter",
+      'diffus.fileCounter',
       vscode.StatusBarAlignment.Left,
       -101,
     );
-    this.fileCounterItem.name = "Diffus File Counter";
+    this.fileCounterItem.name = 'Diffus File Counter';
 
     this.clearStateItem = vscode.window.createStatusBarItem(
-      "diffus.clearState",
+      'diffus.clearState',
       vscode.StatusBarAlignment.Left,
       -102,
     );
-    this.clearStateItem.name = "Diffus Clear State";
-    this.clearStateItem.text = "$(trash) Clear";
-    this.clearStateItem.tooltip = "Diffus: Clear all tracking state";
-    this.clearStateItem.command = "diffus.clearState";
+    this.clearStateItem.name = 'Diffus Clear State';
+    this.clearStateItem.text = '$(trash) Clear';
+    this.clearStateItem.tooltip = 'Diffus: Clear all tracking state';
+    this.clearStateItem.command = 'diffus.clearState';
   }
 
   update(state: TrackingState, changedFileCount: number): void {
     switch (state) {
       case TrackingState.Idle:
-        this.statusBarItem.text = "$(play) Start Tracking";
-        this.statusBarItem.tooltip = "Diffus: Start tracking file changes";
+        this.statusBarItem.text = '$(play) Start Tracking';
+        this.statusBarItem.tooltip = 'Diffus: Start tracking file changes';
         this.fileCounterItem.hide();
         this.clearStateItem.hide();
         break;
 
       case TrackingState.Tracking:
-        this.statusBarItem.text = "$(debug-stop) Stop Tracking";
-        this.statusBarItem.tooltip = "Diffus: Stop tracking file changes";
+        this.statusBarItem.text = '$(debug-stop) Stop Tracking';
+        this.statusBarItem.tooltip = 'Diffus: Stop tracking file changes';
         if (changedFileCount > 0) {
-          this.fileCounterItem.text = `$(diff) ${changedFileCount} file${changedFileCount !== 1 ? "s" : ""}`;
-          this.fileCounterItem.tooltip = `${changedFileCount} changed file${changedFileCount !== 1 ? "s" : ""}`;
+          this.fileCounterItem.text = `$(diff) ${changedFileCount} file${changedFileCount !== 1 ? 's' : ''}`;
+          this.fileCounterItem.tooltip = `${changedFileCount} changed file${changedFileCount !== 1 ? 's' : ''}`;
           this.fileCounterItem.show();
         } else {
           this.fileCounterItem.hide();
@@ -59,12 +59,11 @@ export class StatusBarManager {
         break;
 
       case TrackingState.StoppedWithPending:
-        this.statusBarItem.text = "$(play) Start Tracking";
-        this.statusBarItem.tooltip =
-          "Diffus: Start tracking (pending diffs remain)";
+        this.statusBarItem.text = '$(play) Start Tracking';
+        this.statusBarItem.tooltip = 'Diffus: Start tracking (pending diffs remain)';
         if (changedFileCount > 0) {
           this.fileCounterItem.text = `$(diff) ${changedFileCount} pending`;
-          this.fileCounterItem.tooltip = `${changedFileCount} file${changedFileCount !== 1 ? "s" : ""} with pending diffs`;
+          this.fileCounterItem.tooltip = `${changedFileCount} file${changedFileCount !== 1 ? 's' : ''} with pending diffs`;
           this.fileCounterItem.show();
         } else {
           this.fileCounterItem.hide();

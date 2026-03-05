@@ -1,23 +1,20 @@
-import * as vscode from "vscode";
-import { TrackingState } from "./types";
-import { SnapshotManager } from "./snapshotManager";
-import { HunkManager } from "./hunkManager";
-import { FileSystemWatcherManager } from "./fileSystemWatcher";
-import { DecorationManager } from "./decorationManager";
-import { DiffusCodeLensProvider } from "./codeLensProvider";
-import { NavigationManager } from "./navigationManager";
-import { StatusBarManager } from "./statusBarManager";
-import { StorageManager } from "./storageManager";
-import { DiffusHoverProvider } from "./hoverProvider";
-import {
-  SnapshotContentProvider,
-  SNAPSHOT_SCHEME,
-} from "./snapshotContentProvider";
-import { DiffViewManager } from "./diffViewManager";
-import { computeHunks } from "./diffEngine";
-import { computeDecorationRanges } from "./rangeCalculator";
-import { Ignore } from "ignore";
-import { loadGitignoreFilter } from "./fileUtils";
+import * as vscode from 'vscode';
+import { TrackingState } from './types';
+import { SnapshotManager } from './snapshotManager';
+import { HunkManager } from './hunkManager';
+import { FileSystemWatcherManager } from './fileSystemWatcher';
+import { DecorationManager } from './decorationManager';
+import { DiffusCodeLensProvider } from './codeLensProvider';
+import { NavigationManager } from './navigationManager';
+import { StatusBarManager } from './statusBarManager';
+import { StorageManager } from './storageManager';
+import { DiffusHoverProvider } from './hoverProvider';
+import { SnapshotContentProvider, SNAPSHOT_SCHEME } from './snapshotContentProvider';
+import { DiffViewManager } from './diffViewManager';
+import { computeHunks } from './diffEngine';
+import { computeDecorationRanges } from './rangeCalculator';
+import { Ignore } from 'ignore';
+import { loadGitignoreFilter } from './fileUtils';
 
 let state = TrackingState.Idle;
 let activeSessionId: string | undefined;
@@ -48,43 +45,33 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // Register snapshot content provider for diff view
   context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(
-      SNAPSHOT_SCHEME,
-      snapshotContentProvider,
-    ),
+    vscode.workspace.registerTextDocumentContentProvider(SNAPSHOT_SCHEME, snapshotContentProvider),
   );
 
   // Register CodeLens provider
   context.subscriptions.push(
-    vscode.languages.registerCodeLensProvider(
-      { scheme: "file" },
-      codeLensProvider,
-    ),
+    vscode.languages.registerCodeLensProvider({ scheme: 'file' }, codeLensProvider),
   );
 
   // Register hover provider
   const hoverProvider = new DiffusHoverProvider(hunkManager);
   context.subscriptions.push(
-    vscode.languages.registerHoverProvider({ scheme: "file" }, hoverProvider),
+    vscode.languages.registerHoverProvider({ scheme: 'file' }, hoverProvider),
   );
 
   // Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand("diffus.startTracking", startTracking),
-    vscode.commands.registerCommand("diffus.stopTracking", stopTracking),
-    vscode.commands.registerCommand("diffus.toggleTracking", toggleTracking),
-    vscode.commands.registerCommand("diffus.nextFile", () =>
-      navigationManager.nextFile(),
-    ),
-    vscode.commands.registerCommand("diffus.prevFile", () =>
-      navigationManager.prevFile(),
-    ),
-    vscode.commands.registerCommand("diffus.acceptHunk", acceptHunk),
-    vscode.commands.registerCommand("diffus.rejectHunk", rejectHunk),
-    vscode.commands.registerCommand("diffus.acceptAllFile", acceptAllFile),
-    vscode.commands.registerCommand("diffus.rejectAllFile", rejectAllFile),
-    vscode.commands.registerCommand("diffus.clearState", clearState),
-    vscode.commands.registerCommand("diffus.showDiff", showDiff),
+    vscode.commands.registerCommand('diffus.startTracking', startTracking),
+    vscode.commands.registerCommand('diffus.stopTracking', stopTracking),
+    vscode.commands.registerCommand('diffus.toggleTracking', toggleTracking),
+    vscode.commands.registerCommand('diffus.nextFile', () => navigationManager.nextFile()),
+    vscode.commands.registerCommand('diffus.prevFile', () => navigationManager.prevFile()),
+    vscode.commands.registerCommand('diffus.acceptHunk', acceptHunk),
+    vscode.commands.registerCommand('diffus.rejectHunk', rejectHunk),
+    vscode.commands.registerCommand('diffus.acceptAllFile', acceptAllFile),
+    vscode.commands.registerCommand('diffus.rejectAllFile', rejectAllFile),
+    vscode.commands.registerCommand('diffus.clearState', clearState),
+    vscode.commands.registerCommand('diffus.showDiff', showDiff),
   );
 
   // Apply decorations when active editor changes
@@ -105,11 +92,7 @@ export function activate(context: vscode.ExtensionContext): void {
       updateContextKeys();
       statusBarManager.update(state, hunkManager.getChangedFileCount());
       const editor = vscode.window.activeTextEditor;
-      if (
-        !isProcessingHunk &&
-        editor &&
-        editor.document.uri.fsPath === changedFilePath
-      ) {
+      if (!isProcessingHunk && editor && editor.document.uri.fsPath === changedFilePath) {
         applyDecorationsToEditor(editor);
       }
     }),
@@ -146,26 +129,16 @@ async function restorePersistedState(): Promise<void> {
       try {
         const uri = vscode.Uri.file(filePath);
         const currentBytes = await vscode.workspace.fs.readFile(uri);
-        const currentContent = Buffer.from(currentBytes).toString("utf-8");
+        const currentContent = Buffer.from(currentBytes).toString('utf-8');
         if (snapshotContent === currentContent) {
           continue;
         }
-        const hunks = computeHunks(
-          snapshotContent,
-          currentContent,
-          persisted.sessionId,
-          filePath,
-        );
+        const hunks = computeHunks(snapshotContent, currentContent, persisted.sessionId, filePath);
         if (hunks.length > 0) {
           hunkManager.setHunksForFile(filePath, persisted.sessionId, hunks);
         }
       } catch {
-        const hunks = computeHunks(
-          snapshotContent,
-          "",
-          persisted.sessionId,
-          filePath,
-        );
+        const hunks = computeHunks(snapshotContent, '', persisted.sessionId, filePath);
         if (hunks.length > 0) {
           hunkManager.setHunksForFile(filePath, persisted.sessionId, hunks);
         }
@@ -176,10 +149,7 @@ async function restorePersistedState(): Promise<void> {
       const gitignoreFilters = new Map<string, Ignore>();
       const folders = vscode.workspace.workspaceFolders ?? [];
       for (const folder of folders) {
-        gitignoreFilters.set(
-          folder.uri.fsPath,
-          await loadGitignoreFilter(folder),
-        );
+        gitignoreFilters.set(folder.uri.fsPath, await loadGitignoreFilter(folder));
       }
       watcherManager = new FileSystemWatcherManager(
         snapshotManager,
@@ -201,13 +171,12 @@ async function restorePersistedState(): Promise<void> {
       applyDecorationsToEditor(editor);
     }
   } catch (err) {
-    console.error("Diffus: failed to restore persisted state", err);
+    console.error('Diffus: failed to restore persisted state', err);
   }
 }
 
 async function startTracking(): Promise<void> {
-  const { sessionId, gitignoreFilters } =
-    await snapshotManager.startSession();
+  const { sessionId, gitignoreFilters } = await snapshotManager.startSession();
   activeSessionId = sessionId;
 
   watcherManager?.stop();
@@ -231,9 +200,7 @@ function stopTracking(): void {
 
   watcherManager?.stop();
 
-  state = hunkManager.hasChanges()
-    ? TrackingState.StoppedWithPending
-    : TrackingState.Idle;
+  state = hunkManager.hasChanges() ? TrackingState.StoppedWithPending : TrackingState.Idle;
 
   updateContextKeys();
   statusBarManager.update(state, hunkManager.getChangedFileCount());
@@ -293,12 +260,8 @@ async function acceptHunk(hunkId?: string): Promise<void> {
       try {
         const uri = vscode.Uri.file(filePath);
         const contentBytes = await vscode.workspace.fs.readFile(uri);
-        const currentContent = Buffer.from(contentBytes).toString("utf-8");
-        snapshotManager.updateSnapshot(
-          hunk.sessionId,
-          filePath,
-          currentContent,
-        );
+        const currentContent = Buffer.from(contentBytes).toString('utf-8');
+        snapshotManager.updateSnapshot(hunk.sessionId, filePath, currentContent);
       } catch {
         /* ignore */
       }
@@ -348,13 +311,13 @@ async function rejectHunk(hunkId?: string): Promise<void> {
   try {
     if (editor && editor.document.uri.fsPath === filePath) {
       const currentContent = editor.document.getText();
-      const currentLines = currentContent.split("\n");
+      const currentLines = currentContent.split('\n');
 
       const startIdx = hunk.newStart - 1;
       const deleteCount = hunk.newLines.length;
       currentLines.splice(startIdx, deleteCount, ...hunk.oldLines);
 
-      const restoredContent = currentLines.join("\n");
+      const restoredContent = currentLines.join('\n');
 
       const fullRange = new vscode.Range(
         0,
@@ -386,16 +349,10 @@ async function rejectHunk(hunkId?: string): Promise<void> {
 
       hunkManager.removeHunk(hunkId!);
     } else {
-      const snapshotContent = snapshotManager.getSnapshotOrEmpty(
-        hunk.sessionId,
-        filePath,
-      );
+      const snapshotContent = snapshotManager.getSnapshotOrEmpty(hunk.sessionId, filePath);
       try {
         const uri = vscode.Uri.file(filePath);
-        await vscode.workspace.fs.writeFile(
-          uri,
-          Buffer.from(snapshotContent, "utf-8"),
-        );
+        await vscode.workspace.fs.writeFile(uri, Buffer.from(snapshotContent, 'utf-8'));
       } catch {
         /* ignore */
       }
@@ -465,10 +422,7 @@ async function rejectAllFile(): Promise<void> {
   setSelfEditing(true);
   try {
     const sessionId = hunks[0].sessionId;
-    const snapshotContent = snapshotManager.getSnapshotOrEmpty(
-      sessionId,
-      filePath,
-    );
+    const snapshotContent = snapshotManager.getSnapshotOrEmpty(sessionId, filePath);
 
     const fullRange = new vscode.Range(
       0,
@@ -521,15 +475,11 @@ function reapplyDecorations(filePath: string): void {
 
 function updateContextKeys(): void {
   vscode.commands.executeCommand(
-    "setContext",
-    "diffus.isTracking",
+    'setContext',
+    'diffus.isTracking',
     state === TrackingState.Tracking,
   );
-  vscode.commands.executeCommand(
-    "setContext",
-    "diffus.hasChanges",
-    hunkManager.hasChanges(),
-  );
+  vscode.commands.executeCommand('setContext', 'diffus.hasChanges', hunkManager.hasChanges());
   const changedFileCount = hunkManager.getChangedFileCount();
   const editor = vscode.window.activeTextEditor;
   const activeFileHasChanges = editor
@@ -537,22 +487,12 @@ function updateContextKeys(): void {
     : false;
 
   // Show nav when multiple files changed, OR single file changed but user is in a different file
-  const showNav =
-    changedFileCount > 1 ||
-    (changedFileCount === 1 && !activeFileHasChanges);
+  const showNav = changedFileCount > 1 || (changedFileCount === 1 && !activeFileHasChanges);
 
-  vscode.commands.executeCommand(
-    "setContext",
-    "diffus.multipleFilesChanged",
-    showNav,
-  );
+  vscode.commands.executeCommand('setContext', 'diffus.multipleFilesChanged', showNav);
 
   if (editor) {
-    vscode.commands.executeCommand(
-      "setContext",
-      "diffus.fileHasChanges",
-      activeFileHasChanges,
-    );
+    vscode.commands.executeCommand('setContext', 'diffus.fileHasChanges', activeFileHasChanges);
   }
 }
 
@@ -598,11 +538,7 @@ export async function deactivate(): Promise<void> {
   if (activeSessionId && state !== TrackingState.Idle) {
     const sessionData = snapshotManager.getSessionData(activeSessionId);
     if (sessionData) {
-      storageManager.saveSessionSync(
-        sessionData.id,
-        state,
-        sessionData.snapshots,
-      );
+      storageManager.saveSessionSync(sessionData.id, state, sessionData.snapshots);
     }
   } else {
     storageManager.clearSync();

@@ -1,4 +1,4 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 import {
   ADDED_LINE_BG,
   ADDED_LINE_BG_OVERVIEW,
@@ -6,7 +6,7 @@ import {
   REMOVED_LINE_BG_OVERVIEW,
   REMOVED_LINE_BORDER,
   DELETION_MARKER_TEXT_COLOR,
-} from "./constants";
+} from './constants';
 
 export interface DeletionMarker {
   line: number; // 0-based
@@ -24,8 +24,8 @@ export class DecorationManager {
       isWholeLine: true,
       overviewRulerColor: ADDED_LINE_BG_OVERVIEW,
       overviewRulerLane: vscode.OverviewRulerLane.Full,
-      borderWidth: "0 0 0 3px",
-      borderStyle: "solid",
+      borderWidth: '0 0 0 3px',
+      borderStyle: 'solid',
       borderColor: ADDED_LINE_BORDER,
     });
 
@@ -33,8 +33,8 @@ export class DecorationManager {
       isWholeLine: true,
       overviewRulerColor: REMOVED_LINE_BG_OVERVIEW,
       overviewRulerLane: vscode.OverviewRulerLane.Full,
-      borderWidth: "0 0 2px 0",
-      borderStyle: "solid",
+      borderWidth: '0 0 2px 0',
+      borderStyle: 'solid',
       borderColor: REMOVED_LINE_BORDER,
     });
   }
@@ -46,18 +46,16 @@ export class DecorationManager {
   ): void {
     editor.setDecorations(this.addedDecorationType, addedRanges);
 
-    const markerDecorations: vscode.DecorationOptions[] = deletionMarkers.map(
-      (marker) => ({
-        range: new vscode.Range(marker.line, 0, marker.line, 0),
-        renderOptions: {
-          after: {
-            contentText: `  ← ${marker.content}`,
-            color: DELETION_MARKER_TEXT_COLOR,
-            fontStyle: "italic",
-          },
+    const markerDecorations: vscode.DecorationOptions[] = deletionMarkers.map((marker) => ({
+      range: new vscode.Range(marker.line, 0, marker.line, 0),
+      renderOptions: {
+        after: {
+          contentText: `  ← ${marker.content}`,
+          color: DELETION_MARKER_TEXT_COLOR,
+          fontStyle: 'italic',
         },
-      }),
-    );
+      },
+    }));
 
     editor.setDecorations(this.deletionMarkerType, markerDecorations);
   }

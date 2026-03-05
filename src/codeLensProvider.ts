@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import { HunkManager } from "./hunkManager";
+import * as vscode from 'vscode';
+import { HunkManager } from './hunkManager';
 
 export class DiffusCodeLensProvider implements vscode.CodeLensProvider {
   private _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
@@ -27,8 +27,8 @@ export class DiffusCodeLensProvider implements vscode.CodeLensProvider {
 
     codeLenses.push(
       new vscode.CodeLens(firstRange, {
-        title: "$(diff) Show Diff",
-        command: "diffus.showDiff",
+        title: '$(diff) Show Diff',
+        command: 'diffus.showDiff',
       }),
     );
 
@@ -36,13 +36,13 @@ export class DiffusCodeLensProvider implements vscode.CodeLensProvider {
       codeLenses.push(
         new vscode.CodeLens(firstRange, {
           title: `$(check-all) Accept All (${sortedHunks.length})`,
-          command: "diffus.acceptAllFile",
+          command: 'diffus.acceptAllFile',
         }),
       );
       codeLenses.push(
         new vscode.CodeLens(firstRange, {
           title: `$(discard) Reject All (${sortedHunks.length})`,
-          command: "diffus.rejectAllFile",
+          command: 'diffus.rejectAllFile',
         }),
       );
     }
@@ -53,16 +53,16 @@ export class DiffusCodeLensProvider implements vscode.CodeLensProvider {
 
       codeLenses.push(
         new vscode.CodeLens(range, {
-          title: "$(check) Accept",
-          command: "diffus.acceptHunk",
+          title: '$(check) Accept',
+          command: 'diffus.acceptHunk',
           arguments: [hunk.id],
         }),
       );
 
       codeLenses.push(
         new vscode.CodeLens(range, {
-          title: "$(x) Reject",
-          command: "diffus.rejectHunk",
+          title: '$(x) Reject',
+          command: 'diffus.rejectHunk',
           arguments: [hunk.id],
         }),
       );

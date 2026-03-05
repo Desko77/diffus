@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
-import { SnapshotContentProvider } from "./snapshotContentProvider";
-import * as path from "path";
+import * as vscode from 'vscode';
+import { SnapshotContentProvider } from './snapshotContentProvider';
+import * as path from 'path';
 
 export class DiffViewManager {
   /** Track which files have open diff tabs to avoid duplicates */
@@ -12,7 +12,7 @@ export class DiffViewManager {
     const fileName = path.basename(filePath);
 
     await vscode.commands.executeCommand(
-      "vscode.diff",
+      'vscode.diff',
       snapshotUri,
       currentUri,
       `Diffus: ${fileName} (snapshot ↔ current)`,

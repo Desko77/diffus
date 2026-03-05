@@ -1,15 +1,13 @@
-import * as vscode from "vscode";
-import { SnapshotManager } from "./snapshotManager";
+import * as vscode from 'vscode';
+import { SnapshotManager } from './snapshotManager';
 
-export const SNAPSHOT_SCHEME = "diffus-snapshot";
+export const SNAPSHOT_SCHEME = 'diffus-snapshot';
 
 /**
  * Provides snapshot content for the left side of the diff editor.
  * URI format: diffus-snapshot:///filePath?session=sessionId
  */
-export class SnapshotContentProvider
-  implements vscode.TextDocumentContentProvider
-{
+export class SnapshotContentProvider implements vscode.TextDocumentContentProvider {
   private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
   readonly onDidChange = this._onDidChange.event;
 
@@ -17,7 +15,7 @@ export class SnapshotContentProvider
 
   provideTextDocumentContent(uri: vscode.Uri): string {
     const filePath = uri.path;
-    const sessionId = new URLSearchParams(uri.query).get("session") ?? "";
+    const sessionId = new URLSearchParams(uri.query).get('session') ?? '';
     return this.snapshotManager.getSnapshotOrEmpty(sessionId, filePath);
   }
 

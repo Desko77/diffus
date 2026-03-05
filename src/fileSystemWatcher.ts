@@ -1,15 +1,10 @@
-import * as vscode from "vscode";
-import { DEBOUNCE_MS } from "./constants";
-import { Ignore } from "ignore";
-import {
-  isBinaryFile,
-  shouldIgnorePath,
-  isFileTooLarge,
-  isGitignored,
-} from "./fileUtils";
-import { computeHunks } from "./diffEngine";
-import { SnapshotManager } from "./snapshotManager";
-import { HunkManager } from "./hunkManager";
+import * as vscode from 'vscode';
+import { DEBOUNCE_MS } from './constants';
+import { Ignore } from 'ignore';
+import { isBinaryFile, shouldIgnorePath, isFileTooLarge, isGitignored } from './fileUtils';
+import { computeHunks } from './diffEngine';
+import { SnapshotManager } from './snapshotManager';
+import { HunkManager } from './hunkManager';
 
 export class FileSystemWatcherManager {
   private watcher: vscode.FileSystemWatcher | undefined;
@@ -31,7 +26,7 @@ export class FileSystemWatcherManager {
       return;
     }
 
-    this.watcher = vscode.workspace.createFileSystemWatcher("**/*");
+    this.watcher = vscode.workspace.createFileSystemWatcher('**/*');
 
     this.disposables.push(
       this.watcher.onDidChange((uri) => this.onFileEvent(uri)),
@@ -99,18 +94,13 @@ export class FileSystemWatcherManager {
         return;
       }
       const contentBytes = await vscode.workspace.fs.readFile(uri);
-      const currentContent = Buffer.from(contentBytes).toString("utf-8");
+      const currentContent = Buffer.from(contentBytes).toString('utf-8');
       const snapshotContent = this.snapshotManager.getSnapshotOrEmpty(
         this.activeSessionId,
         filePath,
       );
 
-      const hunks = computeHunks(
-        snapshotContent,
-        currentContent,
-        this.activeSessionId,
-        filePath,
-      );
+      const hunks = computeHunks(snapshotContent, currentContent, this.activeSessionId, filePath);
       this.hunkManager.setHunksForFile(filePath, this.activeSessionId, hunks);
     } catch {
       // File might have been deleted between event and processing
@@ -127,21 +117,13 @@ export class FileSystemWatcherManager {
       return;
     }
 
-    const snapshotContent = this.snapshotManager.getSnapshot(
-      this.activeSessionId,
-      filePath,
-    );
+    const snapshotContent = this.snapshotManager.getSnapshot(this.activeSessionId, filePath);
     if (snapshotContent === undefined) {
       return; // File wasn't tracked
     }
 
     // File was deleted — all snapshot lines are "removed"
-    const hunks = computeHunks(
-      snapshotContent,
-      "",
-      this.activeSessionId,
-      filePath,
-    );
+    const hunks = computeHunks(snapshotContent, '', this.activeSessionId, filePath);
     this.hunkManager.setHunksForFile(filePath, this.activeSessionId, hunks);
   }
 
