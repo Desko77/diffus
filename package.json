@@ -77,9 +77,19 @@
         "command": "diffus.showDiff",
         "title": "Diffus: Show Diff",
         "icon": "$(diff)"
+      },
+      {
+        "command": "diffus.copyPathForClaude",
+        "title": "Copy Path for Claude Code"
       }
     ],
     "menus": {
+      "explorer/context": [
+        {
+          "command": "diffus.copyPathForClaude",
+          "group": "5_cutcopypaste@30"
+        }
+      ],
       "editor/title": [
         {
           "command": "diffus.prevFile",

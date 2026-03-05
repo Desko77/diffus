@@ -7,3 +7,5 @@ cd /c/development/projects/diffus && npx @vscode/vsce package && code --install-
 ```
 
 This is mandatory after every code change — always do it before telling the user the change is ready.
+
+Write tests after feature implementation

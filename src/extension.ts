@@ -15,6 +15,7 @@ import { computeHunks } from './diffEngine';
 import { computeDecorationRanges } from './rangeCalculator';
 import { Ignore } from 'ignore';
 import { loadGitignoreFilter } from './fileUtils';
+import { copyPathForClaude } from './copyPathCommand';
 
 let state = TrackingState.Idle;
 let activeSessionId: string | undefined;
@@ -72,6 +73,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('diffus.rejectAllFile', rejectAllFile),
     vscode.commands.registerCommand('diffus.clearState', clearState),
     vscode.commands.registerCommand('diffus.showDiff', showDiff),
+    vscode.commands.registerCommand('diffus.copyPathForClaude', copyPathForClaude),
   );
 
   // Apply decorations when active editor changes

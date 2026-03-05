@@ -48,6 +48,16 @@ export class Uri {
 export const workspace = {
   openTextDocument: vi.fn(),
   workspaceFolders: [],
+  asRelativePath: vi.fn((uri: { fsPath: string } | string) => {
+    const fsPath = typeof uri === 'string' ? uri : uri.fsPath;
+    return fsPath;
+  }),
+};
+
+export const env = {
+  clipboard: {
+    writeText: vi.fn(),
+  },
 };
 
 export const window = {
