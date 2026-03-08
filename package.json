@@ -4,6 +4,10 @@
   "description": "Inline diff review for AI code changes",
   "version": "0.1.0",
   "publisher": "local",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RostislavDugin/diffus.git"
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
