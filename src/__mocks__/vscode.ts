@@ -60,6 +60,23 @@ export const env = {
   },
 };
 
+export class CodeLens {
+  constructor(
+    public readonly range: Range,
+    public readonly command?: {
+      title: string;
+      command: string;
+      arguments?: unknown[];
+    },
+  ) {}
+}
+
+export const commands = {
+  executeCommand: vi.fn().mockResolvedValue(undefined),
+};
+
 export const window = {
   showTextDocument: vi.fn(),
+  activeTextEditor: undefined as unknown,
+  onDidChangeTextEditorSelection: vi.fn(() => ({ dispose: vi.fn() })),
 };

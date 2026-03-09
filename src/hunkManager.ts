@@ -116,6 +116,47 @@ export class HunkManager {
     return undefined;
   }
 
+  /** Get the next hunk after the given line in the same file, or the first hunk in the next changed file */
+  getNextHunk(
+    filePath: string,
+    afterLine: number,
+  ): { hunk: DiffHunk; filePath: string } | undefined {
+    // Try same file first
+    const hunks = this.getAllHunksForFile(filePath);
+    const next = hunks.find((h) => h.newStart > afterLine);
+    if (next) {
+      return { hunk: next, filePath };
+    }
+
+    // Try next changed file
+    const files = this.getChangedFiles();
+    const currentIdx = files.indexOf(filePath);
+    if (currentIdx === -1 && files.length > 0) {
+      const firstHunks = this.getAllHunksForFile(files[0]);
+      if (firstHunks.length > 0) {
+        return { hunk: firstHunks[0], filePath: files[0] };
+      }
+    }
+
+    for (let i = 1; i <= files.length; i++) {
+      const nextFile = files[(currentIdx + i) % files.length];
+      if (nextFile === filePath) {
+        // Wrapped around, check if there are remaining hunks at start of same file
+        const remaining = this.getAllHunksForFile(filePath);
+        if (remaining.length > 0) {
+          return { hunk: remaining[0], filePath };
+        }
+        return undefined;
+      }
+      const nextHunks = this.getAllHunksForFile(nextFile);
+      if (nextHunks.length > 0) {
+        return { hunk: nextHunks[0], filePath: nextFile };
+      }
+    }
+
+    return undefined;
+  }
+
   getSessionIdsForFile(filePath: string): string[] {
     const states = this.fileStates.get(filePath);
     return states?.map((s) => s.sessionId) ?? [];

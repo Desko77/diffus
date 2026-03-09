@@ -32,41 +32,25 @@ export class DiffusCodeLensProvider implements vscode.CodeLensProvider {
       }),
     );
 
-    if (sortedHunks.length > 1) {
-      codeLenses.push(
-        new vscode.CodeLens(firstRange, {
-          title: `$(check-all) Accept All (${sortedHunks.length})`,
-          command: 'diffus.acceptAllFile',
-        }),
-      );
-      codeLenses.push(
-        new vscode.CodeLens(firstRange, {
-          title: `$(discard) Reject All (${sortedHunks.length})`,
-          command: 'diffus.rejectAllFile',
-        }),
-      );
-    }
+    codeLenses.push(
+      new vscode.CodeLens(firstRange, {
+        title: `$(check-all) Accept All (${sortedHunks.length})`,
+        command: 'diffus.acceptAllFile',
+      }),
+    );
+    codeLenses.push(
+      new vscode.CodeLens(firstRange, {
+        title: `$(discard) Reject All (${sortedHunks.length})`,
+        command: 'diffus.rejectAllFile',
+      }),
+    );
 
-    for (const hunk of sortedHunks) {
-      const lensLine = Math.max(0, hunk.newStart - 1);
-      const range = new vscode.Range(lensLine, 0, lensLine, 0);
-
-      codeLenses.push(
-        new vscode.CodeLens(range, {
-          title: '$(check) Accept',
-          command: 'diffus.acceptHunk',
-          arguments: [hunk.id],
-        }),
-      );
-
-      codeLenses.push(
-        new vscode.CodeLens(range, {
-          title: '$(x) Reject',
-          command: 'diffus.rejectHunk',
-          arguments: [hunk.id],
-        }),
-      );
-    }
+    codeLenses.push(
+      new vscode.CodeLens(firstRange, {
+        title: '$(keyboard) Tab = Accept | Esc = Reject',
+        command: '',
+      }),
+    );
 
     return codeLenses;
   }

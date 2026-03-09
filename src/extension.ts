@@ -16,10 +16,13 @@ import { computeDecorationRanges } from './rangeCalculator';
 import { Ignore } from 'ignore';
 import { loadGitignoreFilter } from './fileUtils';
 import { copyPathForClaude } from './copyPathCommand';
+import { CursorTracker } from './cursorTracker';
+import { AUTO_OPEN_DEBOUNCE_MS } from './constants';
 
 let state = TrackingState.Idle;
 let activeSessionId: string | undefined;
 let isProcessingHunk = false;
+let autoOpenTimer: NodeJS.Timeout | undefined;
 
 let snapshotManager: SnapshotManager;
 let hunkManager: HunkManager;
@@ -31,6 +34,7 @@ let statusBarManager: StatusBarManager;
 let storageManager: StorageManager;
 let snapshotContentProvider: SnapshotContentProvider;
 let diffViewManager: DiffViewManager;
+let cursorTracker: CursorTracker;
 
 export function activate(context: vscode.ExtensionContext): void {
   storageManager = new StorageManager();
@@ -43,6 +47,7 @@ export function activate(context: vscode.ExtensionContext): void {
   diffViewManager = new DiffViewManager();
 
   codeLensProvider = new DiffusCodeLensProvider(hunkManager);
+  cursorTracker = new CursorTracker(hunkManager);
 
   // Register snapshot content provider for diff view
   context.subscriptions.push(
@@ -84,6 +89,7 @@ export function activate(context: vscode.ExtensionContext): void {
         navigationManager.syncToActiveEditor(editor);
         applyDecorationsToEditor(editor);
       }
+      cursorTracker.update();
       updateContextKeys();
       statusBarManager.update(state, hunkManager.getChangedFileCount());
     }),
@@ -92,6 +98,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Track hunk changes for UI updates
   context.subscriptions.push(
     hunkManager.onDidChange((changedFilePath) => {
+      cursorTracker.update();
       updateContextKeys();
       statusBarManager.update(state, hunkManager.getChangedFileCount());
       const editor = vscode.window.activeTextEditor;
@@ -115,6 +122,7 @@ export function activate(context: vscode.ExtensionContext): void {
     statusBarManager,
     snapshotContentProvider,
     diffViewManager,
+    cursorTracker,
   );
 }
 
@@ -161,6 +169,7 @@ async function restorePersistedState(): Promise<void> {
         gitignoreFilters,
       );
       watcherManager.start();
+      subscribeToAutoOpen();
       state = TrackingState.Tracking;
     } else if (hunkManager.hasChanges()) {
       state = TrackingState.StoppedWithPending;
@@ -190,6 +199,7 @@ async function startTracking(): Promise<void> {
     gitignoreFilters,
   );
   watcherManager.start();
+  subscribeToAutoOpen();
 
   state = TrackingState.Tracking;
   updateContextKeys();
@@ -298,7 +308,8 @@ async function acceptHunk(hunkId?: string): Promise<void> {
   }
 
   reapplyDecorations(filePath);
-  checkAllResolved(filePath);
+  await checkAllResolved(filePath);
+  await navigateToNextHunk(filePath);
 }
 
 async function rejectHunk(hunkId?: string): Promise<void> {
@@ -390,7 +401,8 @@ async function rejectHunk(hunkId?: string): Promise<void> {
   }
 
   reapplyDecorations(filePath);
-  checkAllResolved(filePath);
+  await checkAllResolved(filePath);
+  await navigateToNextHunk(filePath);
 }
 
 async function acceptAllFile(): Promise<void> {
@@ -421,7 +433,8 @@ async function acceptAllFile(): Promise<void> {
     isProcessingHunk = false;
   }
 
-  checkAllResolved(filePath);
+  await checkAllResolved(filePath);
+  await navigateToNextHunk(filePath);
 }
 
 async function rejectAllFile(): Promise<void> {
@@ -473,7 +486,49 @@ async function rejectAllFile(): Promise<void> {
     setSelfEditing(false);
   }
 
-  checkAllResolved(filePath);
+  await checkAllResolved(filePath);
+  await navigateToNextHunk(filePath);
+}
+
+async function navigateToNextHunk(filePath: string): Promise<void> {
+  const remaining = hunkManager.getAllHunksForFile(filePath);
+  if (remaining.length > 0) {
+    await navigationManager.navigateToHunk(filePath, remaining[0].newStart);
+  } else {
+    const next = hunkManager.getNextHunk(filePath, Infinity);
+    if (next) {
+      await navigationManager.navigateToHunk(next.filePath, next.hunk.newStart);
+    }
+  }
+}
+
+function subscribeToAutoOpen(): void {
+  if (!watcherManager) {
+    return;
+  }
+  watcherManager.onDidDetectChanges(() => {
+    if (state !== TrackingState.Tracking) {
+      return;
+    }
+    if (autoOpenTimer) {
+      clearTimeout(autoOpenTimer);
+    }
+    autoOpenTimer = setTimeout(() => {
+      autoOpenTimer = undefined;
+      // Don't auto-open if user is already viewing a changed file
+      const editor = vscode.window.activeTextEditor;
+      if (editor && hunkManager.fileHasChanges(editor.document.uri.fsPath)) {
+        return;
+      }
+      const files = hunkManager.getChangedFiles();
+      if (files.length > 0) {
+        const hunks = hunkManager.getAllHunksForFile(files[0]);
+        if (hunks.length > 0) {
+          navigationManager.navigateToHunk(files[0], hunks[0].newStart);
+        }
+      }
+    }, AUTO_OPEN_DEBOUNCE_MS);
+  });
 }
 
 function applyDecorationsToEditor(editor: vscode.TextEditor): void {

@@ -162,6 +162,56 @@ describe('HunkManager', () => {
     });
   });
 
+  describe('getNextHunk', () => {
+    it('returns next hunk in same file', () => {
+      const h1 = makeHunk('h1', 's1', 5);
+      const h2 = makeHunk('h2', 's1', 15);
+      manager.setHunksForFile('file.ts', 's1', [h1, h2]);
+
+      const result = manager.getNextHunk('file.ts', 5);
+      expect(result).toBeDefined();
+      expect(result!.hunk.id).toBe('h2');
+      expect(result!.filePath).toBe('file.ts');
+    });
+
+    it('returns first hunk of next file when no more hunks in current file', () => {
+      const h1 = makeHunk('h1', 's1', 5);
+      const h2 = makeHunk('h2', 's1', 3);
+      manager.setHunksForFile('a.ts', 's1', [h1]);
+      manager.setHunksForFile('b.ts', 's1', [h2]);
+
+      const result = manager.getNextHunk('a.ts', 100);
+      expect(result).toBeDefined();
+      expect(result!.hunk.id).toBe('h2');
+      expect(result!.filePath).toBe('b.ts');
+    });
+
+    it('returns undefined when no hunks remain anywhere', () => {
+      expect(manager.getNextHunk('file.ts', 1)).toBeUndefined();
+    });
+
+    it('returns first hunk if afterLine is before all hunks', () => {
+      const h1 = makeHunk('h1', 's1', 10);
+      manager.setHunksForFile('file.ts', 's1', [h1]);
+
+      const result = manager.getNextHunk('file.ts', 1);
+      expect(result).toBeDefined();
+      expect(result!.hunk.id).toBe('h1');
+    });
+
+    it('wraps to first file when current is last file', () => {
+      const h1 = makeHunk('h1', 's1', 5);
+      const h2 = makeHunk('h2', 's1', 3);
+      manager.setHunksForFile('a.ts', 's1', [h1]);
+      manager.setHunksForFile('b.ts', 's1', [h2]);
+
+      const result = manager.getNextHunk('b.ts', 100);
+      expect(result).toBeDefined();
+      expect(result!.hunk.id).toBe('h1');
+      expect(result!.filePath).toBe('a.ts');
+    });
+  });
+
   describe('getSessionIdsForFile', () => {
     it('returns session IDs for a file', () => {
       manager.setHunksForFile('file.ts', 's1', [makeHunk('h1', 's1')]);

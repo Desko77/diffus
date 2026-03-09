@@ -11,6 +11,10 @@ export class FileSystemWatcherManager {
   private debounceTimers: Map<string, NodeJS.Timeout> = new Map();
   private disposables: vscode.Disposable[] = [];
 
+  private _onDidDetectChanges = new vscode.EventEmitter<string>();
+  /** Fires after a file change is processed and hunks are detected */
+  readonly onDidDetectChanges = this._onDidDetectChanges.event;
+
   /** Set to true when the extension itself is making edits (to avoid recursion) */
   selfEditing = false;
 
@@ -102,6 +106,9 @@ export class FileSystemWatcherManager {
 
       const hunks = computeHunks(snapshotContent, currentContent, this.activeSessionId, filePath);
       this.hunkManager.setHunksForFile(filePath, this.activeSessionId, hunks);
+      if (hunks.length > 0) {
+        this._onDidDetectChanges.fire(filePath);
+      }
     } catch {
       // File might have been deleted between event and processing
     }
@@ -129,5 +136,6 @@ export class FileSystemWatcherManager {
 
   dispose(): void {
     this.stop();
+    this._onDidDetectChanges.dispose();
   }
 }
