@@ -24,8 +24,11 @@ CLI AI tools modify files directly on disk but only show diffs in the terminal, 
 
 ## Features
 
-- **Inline diff rendering** — added lines highlighted green, removed lines shown as red ghost lines (no side-by-side view needed)
-- **Per-hunk accept/reject** — CodeLens buttons on each hunk
+- **Inline diff rendering** — added lines highlighted green, removed lines shown as red ghost lines with red left border (no side-by-side view needed)
+- **Keyboard-driven review** — `Tab` to accept hunk, `Escape` to reject — works only when cursor is inside a hunk, doesn't interfere with autocomplete, snippets, find widget, etc.
+- **Auto-navigation** — after accepting/rejecting a hunk, automatically jumps to the next hunk in the same file or opens the next changed file
+- **Auto-open on changes** — when the filesystem watcher detects AI changes, automatically opens the first changed file (with 500ms debounce)
+- **Per-hunk accept/reject** — CodeLens actions on each hunk
 - **Per-file accept all / reject all** — editor title bar buttons
 - **File navigation** — Back/Next buttons with file counter (e.g. "2 / 5 files")
 - **Status bar toggle** — Start/Stop tracking with changed file count badge
@@ -34,17 +37,19 @@ CLI AI tools modify files directly on disk but only show diffs in the terminal, 
 
 ## Commands & Keybindings
 
-| Command                 | Description                         |
-| ----------------------- | ----------------------------------- |
-| `diffus.toggleTracking` | Toggle tracking on/off (status bar) |
-| `diffus.startTracking`  | Start tracking changes              |
-| `diffus.stopTracking`   | Stop tracking changes               |
-| `diffus.nextFile`       | Next changed file (`Alt+]`)         |
-| `diffus.prevFile`       | Previous changed file (`Alt+[`)     |
-| `diffus.acceptHunk`     | Accept hunk at cursor               |
-| `diffus.rejectHunk`     | Reject hunk at cursor               |
-| `diffus.acceptAllFile`  | Accept all hunks in file            |
-| `diffus.rejectAllFile`  | Reject all hunks in file            |
+| Command                 | Keybinding | Description                         |
+| ----------------------- | ---------- | ----------------------------------- |
+| `diffus.toggleTracking` |            | Toggle tracking on/off (status bar) |
+| `diffus.startTracking`  |            | Start tracking changes              |
+| `diffus.stopTracking`   |            | Stop tracking changes               |
+| `diffus.nextFile`       | `Alt+]`    | Next changed file                   |
+| `diffus.prevFile`       | `Alt+[`    | Previous changed file               |
+| `diffus.acceptHunk`     | `Tab`      | Accept hunk at cursor               |
+| `diffus.rejectHunk`     | `Escape`   | Reject hunk at cursor               |
+| `diffus.acceptAllFile`  |            | Accept all hunks in file            |
+| `diffus.rejectAllFile`  |            | Reject all hunks in file            |
+
+> `Tab` and `Escape` are only active when the cursor is inside a diff hunk. They won't interfere with normal editing, autocomplete, snippets, find widget, or any other VS Code functionality.
 
 ## Install
 
