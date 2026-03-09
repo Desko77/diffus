@@ -26,6 +26,22 @@ export class NavigationManager {
     await this.openFile(files[this.currentIndex]);
   }
 
+  /** Open a file and position the cursor at the given 1-based line */
+  async navigateToHunk(filePath: string, line: number): Promise<void> {
+    try {
+      const doc = await vscode.workspace.openTextDocument(filePath);
+      const editor = await vscode.window.showTextDocument(doc);
+      const position = new vscode.Position(Math.max(0, line - 1), 0);
+      editor.selection = new vscode.Selection(position, position);
+      editor.revealRange(
+        new vscode.Range(position, position),
+        vscode.TextEditorRevealType.InCenterIfOutsideViewport,
+      );
+    } catch {
+      // File might have been deleted
+    }
+  }
+
   private async openFile(filePath: string): Promise<void> {
     try {
       const doc = await vscode.workspace.openTextDocument(filePath);

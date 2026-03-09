@@ -1,4 +1,5 @@
 export const DEBOUNCE_MS = 300;
+export const AUTO_OPEN_DEBOUNCE_MS = 500;
 
 export const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
 

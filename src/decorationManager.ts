@@ -33,7 +33,7 @@ export class DecorationManager {
       isWholeLine: true,
       overviewRulerColor: REMOVED_LINE_BG_OVERVIEW,
       overviewRulerLane: vscode.OverviewRulerLane.Full,
-      borderWidth: '0 0 2px 0',
+      borderWidth: '0 0 2px 3px',
       borderStyle: 'solid',
       borderColor: REMOVED_LINE_BORDER,
     });

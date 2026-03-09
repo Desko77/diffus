@@ -129,6 +129,16 @@
       {
         "command": "diffus.prevFile",
         "key": "alt+["
+      },
+      {
+        "command": "diffus.acceptHunk",
+        "key": "tab",
+        "when": "diffus.cursorInHunk && editorTextFocus && !editorHasSelection && !suggestWidgetVisible && !inSnippetMode && !editorTabMovesFocus && !editorReadonly"
+      },
+      {
+        "command": "diffus.rejectHunk",
+        "key": "escape",
+        "when": "diffus.cursorInHunk && editorTextFocus && !suggestWidgetVisible && !findWidgetVisible && !inQuickOpen && !renameInputVisible && !parameterHintsVisible && !editorHasMultipleSelections"
       }
     ]
   },
