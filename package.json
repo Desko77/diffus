@@ -2,7 +2,7 @@
   "name": "diffus",
   "displayName": "Diffus",
   "description": "Inline diff review for AI code changes",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "local",
   "repository": {
     "type": "git",
